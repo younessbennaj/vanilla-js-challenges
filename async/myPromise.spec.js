@@ -1,3 +1,4 @@
+// Mock Promise class to understand anatomy of promise object
 class MyPromise {
   constructor(executor) {
     this.status = 'pending';
@@ -19,9 +20,19 @@ class MyPromise {
 
   then(onFulfillment, onRejection) {
     if(onFulfillment && this.success) {
-      onFulfillment(this.success);
+      // the return of the fullfillment method is binded to "success" instance property value 
+      // this mecanism allow value to be used through then method chaining
+      this.success = onFulfillment(this.success);
     }
 
+    if(onRejection && this.error) {
+      onRejection(this.error);
+    }
+
+    return this;
+  }
+
+  catch(onRejection) {
     if(onRejection && this.error) {
       onRejection(this.error);
     }
@@ -122,11 +133,75 @@ describe('Promise instance', () => {
     })
   })
 
-  // .catch(onRejection) here
+  describe('"catch" instance method', () => {
+    test('Promise intance should be provided with a catch() instance method', () => {
+      const promise = new MyPromise(function() {});
+      expect(() => promise.catch()).not.toThrow(TypeError);
+    })
+
+    test('catch rejection handler should be called', () => {
+      const resolveFuncVal = 'success';
+      const rejectFuncVal = 'failed'
+
+      const executor = function(resolveFunc, rejectFunc) {
+        // Do some asynchronous operation here
+        // mock asynchronous operation success with resolveFuncVal
+        const asyncOpSucceeded = false
+        // if asynchronous operation succeeded
+        if(asyncOpSucceeded) {
+          // we can call resolve function with 
+          resolveFunc(resolveFuncVal);
+        } else {
+          rejectFunc(rejectFuncVal);
+        }
+      }
+
+      let valueToTest;
+      let errorToTest;
+
+      const promise = new MyPromise(executor)
+
+      // .then(..., onRejection)
+      promise.then(function(res) {
+        // res: expect to be the value passed to resolveFunc() into executor logic
+        valueToTest = res;
+      }).catch(function(err) {
+        // err: expect to be the value passed to rejectFunc() into executor logic
+        errorToTest = err;
+      })
+    
+      expect(errorToTest).toBe(rejectFuncVal)
+      expect(valueToTest).toBe(undefined)
+    })
+  })
+
+  describe('promise chaining', () => {
+    test('chaining then() method', () => {
+      const promise = new MyPromise((resolve) => { 
+        // ... asnyc operation 
+        resolve(10);
+      });
+      
+      const addTwo = (number) => {  
+        return number + 2;
+      };
+      
+      const divideByThree = (number) => {  
+        return number / 3;
+      };
+      
+      const square = (number) => {
+        return number * number;
+      };
+      
+      // Chaining them all together
+      promise.then(addTwo).then(divideByThree).then(square).then((number) => {
+        expect(number).toBe(16)
+      });
+    })
+  })
 
   /*/ TODO
-  - implement .catch(onRejection) method 
-  - understand and implment promise chaining
   - implement finally
   /*/ 
 });
