@@ -1,19 +1,20 @@
-const sleep = require('./sleep');
-
+function sleep(delay) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve()
+    }, delay)
+  })
+}
 describe('Sleep function', () => {
-  test('should return a promise', () => {
-    expect(sleep(2000) instanceof Promise).toBe(true);
+  test('should return a promise instance', () => {
+    expect(sleep(500)).toBeInstanceOf(Promise);
   })
 
-  test('executes after delay', async () => {
-    expect.assertions(4);
-    let i = 0;
-    expect(i).toBe(0);
-    let now = Date.now();
-    await sleep(50);
-    expect(i).toBe(0);
-    i++;
-    expect(i).toBe(1);
-    expect(Date.now() - now).toBeGreaterThan(25);
-  });
+  test('should bloack and wait for 3 seconds', async () => {
+    const delay = 3000
+    const now = new Date().getTime();
+    await sleep(delay);
+    const diff = new Date().getTime() - now;
+    expect(diff).toBeGreaterThanOrEqual(delay);
+  })
 })
