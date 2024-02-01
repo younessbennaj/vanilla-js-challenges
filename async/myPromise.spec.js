@@ -200,8 +200,4 @@ describe('Promise instance', () => {
       });
     })
   })
-
-  /*/ TODO
-  - implement finally
-  /*/ 
 });
