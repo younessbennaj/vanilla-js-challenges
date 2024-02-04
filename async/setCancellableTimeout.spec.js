@@ -1,8 +1,8 @@
-function setCancellableTimeout(callback, delay) {
+function setCancellableTimeout(callback, delay, ...args) {
   if(!callback || !delay) {
     throw new Error('callback or delay are missing')
   }
-  const id = setTimeout(callback, delay);
+  const id = setTimeout(() => callback(...args), delay);
   return function() {
     clearTimeout(id)
   };
