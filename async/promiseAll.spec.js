@@ -1,19 +1,26 @@
 function promiseAll(promises) {
-  const bool = promises.some((p) => p instanceof Promise);
-
   return new Promise(async (resolve, reject) => {
     const result = [];
 
-    for (let p of promises) {
-      try {
-        const res = await p;
-        result.push(res);
-      } catch (err) {
-        reject(err);
-      }
+    let count = 0;
+
+    if (promises.length === 0) {
+      resolve([]);
     }
 
-    resolve(result);
+    for (let i = 0; i < promises.length; i++) {
+      Promise.resolve(promises[i])
+        .then((res) => {
+          result[i] = res;
+          count++;
+          if (count === promises.length) {
+            resolve(result);
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    }
   });
 }
 
@@ -45,6 +52,12 @@ describe("Promise all", () => {
       const res = await promiseAll([p0, p1, p2]);
 
       expect(res).toBeInstanceOf(Array);
+    });
+
+    test("empty input array", async () => {
+      expect.assertions(1);
+      const res = await promiseAll([]);
+      expect(res).toEqual([]);
     });
 
     test("value", async () => {
@@ -107,9 +120,32 @@ describe("Promise all", () => {
       const p1 = new Promise((_, reject) => setTimeout(() => reject(4), 100));
       const p2 = new Promise((_, reject) => setTimeout(() => reject(6), 200));
 
-      promiseAll([p0, p1, p2]).catch((err) => {
-        expect(err).toEqual(2);
+      return promiseAll([p0, p1, p2]).catch((err) => {
+        expect(err).toEqual(4);
       });
+    });
+  });
+
+  describe("Name of the group", () => {
+    test("many promises", async () => {
+      expect.assertions(1);
+      const p0 = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(1);
+        }, 200);
+      });
+      const p1 = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(2);
+        }, 300);
+      });
+      const p2 = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(3);
+        }, 100);
+      });
+
+      await expect(promiseAll([p0, p1, p2])).rejects.toBe(3);
     });
   });
 });
