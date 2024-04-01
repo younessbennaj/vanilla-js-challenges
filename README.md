@@ -1,6 +1,6 @@
 # Vanilla JS Challenge
 
-Welcome to Vanilla JS Challenge! This repository is dedicated to building a collection of JavaScript coding challenges solved using Vanilla JavaScript. Each challenge is thoroughly documented with explanations and accompanied by unit tests.
+Welcome to Vanilla JS Challenges! This repository is dedicated to building a collection of JavaScript coding challenges solved using Vanilla JavaScript. Each challenge is thoroughly documented with explanations and accompanied by unit tests.
 
 Feel free to browse through each challenge to understand the problem statement and see the solution implemented using Vanilla JavaScript.
 
